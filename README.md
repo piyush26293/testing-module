@@ -1,4 +1,4 @@
-# AI-Powered Testing Platform
+# AI-Powered End-to-End Web Application Testing Platform
 
 A complete, production-ready, AI-powered end-to-end web application testing platform with comprehensive DevOps infrastructure.
 

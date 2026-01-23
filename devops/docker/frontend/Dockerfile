@@ -1,6 +1,6 @@
 # Multi-stage build for Next.js Frontend
 # Dependencies stage
-FROM node:20-alpine AS deps
+FROM node:25-alpine AS deps
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY package*.json ./
 RUN npm ci
 
 # Builder stage
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
@@ -32,7 +32,7 @@ ENV NODE_ENV production
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:25-alpine AS production
 
 WORKDIR /app
 
@@ -64,7 +64,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
 CMD ["node", "server.js"]
 
 # Development stage
-FROM node:20-alpine AS development
+FROM node:25-alpine AS development
 
 WORKDIR /app
 

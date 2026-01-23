@@ -1,0 +1,38 @@
+{{- if .Values.backend.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: backend
+data:
+  {{- range $key, $value := .Values.backend.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  DATABASE_HOST: postgres-service
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: {{ .Values.postgres.env.POSTGRES_DB | quote }}
+  REDIS_HOST: redis-service
+  REDIS_PORT: "6379"
+  MINIO_ENDPOINT: minio-service
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET: test-artifacts
+{{- end }}
+---
+{{- if .Values.frontend.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: frontend
+data:
+  {{- range $key, $value := .Values.frontend.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}

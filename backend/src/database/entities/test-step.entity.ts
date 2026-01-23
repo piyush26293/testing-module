@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { TestCase } from './test-case.entity';
 import { ExecutionLog } from './execution-log.entity';
 import { SelfHealingRecord } from './self-healing-record.entity';
@@ -10,7 +20,7 @@ export enum StepType {
   SELECT = 'select',
   WAIT = 'wait',
   ASSERT = 'assert',
-  CUSTOM = 'custom'
+  CUSTOM = 'custom',
 }
 
 export enum LocatorStrategy {
@@ -19,7 +29,7 @@ export enum LocatorStrategy {
   TEXT = 'text',
   ROLE = 'role',
   TESTID = 'testid',
-  AI_GENERATED = 'ai_generated'
+  AI_GENERATED = 'ai_generated',
 }
 
 @Entity('test_steps')
@@ -74,13 +84,13 @@ export class TestStep {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
-  @ManyToOne(() => TestCase, testCase => testCase.steps, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TestCase, (testCase) => testCase.steps, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'testCaseId' })
   testCase: TestCase;
 
-  @OneToMany(() => ExecutionLog, executionLog => executionLog.step)
+  @OneToMany(() => ExecutionLog, (executionLog) => executionLog.step)
   executionLogs: ExecutionLog[];
 
-  @OneToMany(() => SelfHealingRecord, selfHealingRecord => selfHealingRecord.step)
+  @OneToMany(() => SelfHealingRecord, (selfHealingRecord) => selfHealingRecord.step)
   selfHealingRecords: SelfHealingRecord[];
 }

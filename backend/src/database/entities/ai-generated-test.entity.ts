@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { TestCase } from './test-case.entity';
 import { User } from './user.entity';
@@ -53,19 +62,19 @@ export class AiGeneratedTest {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
-  @ManyToOne(() => Project, project => project.aiGeneratedTests, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.aiGeneratedTests, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => TestCase, testCase => testCase.aiGeneratedTests, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestCase, (testCase) => testCase.aiGeneratedTests, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'testCaseId' })
   testCase: TestCase;
 
-  @ManyToOne(() => User, user => user.approvedAiTests, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.approvedAiTests, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'approvedBy' })
   approvedByUser: User;
 
-  @ManyToOne(() => User, user => user.createdAiTests, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.createdAiTests, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdBy' })
   createdByUser: User;
 }

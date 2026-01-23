@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -56,7 +61,7 @@ export class AuthService {
     const { email, password } = loginDto;
 
     const user = await this.validateUser(email, password);
-    
+
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -78,7 +83,7 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     const storedToken = await this.refreshTokenRepository.findOne({
-      where: { 
+      where: {
         token: refreshToken,
         revokedAt: null,
         expiresAt: MoreThan(new Date()),
@@ -108,7 +113,7 @@ export class AuthService {
 
   async logout(userId: string, refreshToken: string) {
     const token = await this.refreshTokenRepository.findOne({
-      where: { 
+      where: {
         userId,
         token: refreshToken,
         revokedAt: null,

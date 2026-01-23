@@ -1,4 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany, JoinColumn, Index, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+  Unique,
+} from 'typeorm';
 import { Organization } from './organization.entity';
 import { User } from './user.entity';
 import { ProjectMember } from './project-member.entity';
@@ -12,7 +24,7 @@ import { Report } from './report.entity';
 export enum ProjectStatus {
   ACTIVE = 'active',
   ARCHIVED = 'archived',
-  DELETED = 'deleted'
+  DELETED = 'deleted',
 }
 
 @Entity('projects')
@@ -58,32 +70,32 @@ export class Project {
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => Organization, organization => organization.projects, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Organization, (organization) => organization.projects, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })
   organization: Organization;
 
-  @ManyToOne(() => User, user => user.createdProjects, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.createdProjects, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdBy' })
   createdByUser: User;
 
-  @OneToMany(() => ProjectMember, projectMember => projectMember.project)
+  @OneToMany(() => ProjectMember, (projectMember) => projectMember.project)
   members: ProjectMember[];
 
-  @OneToMany(() => TestSuite, testSuite => testSuite.project)
+  @OneToMany(() => TestSuite, (testSuite) => testSuite.project)
   testSuites: TestSuite[];
 
-  @OneToMany(() => TestCase, testCase => testCase.project)
+  @OneToMany(() => TestCase, (testCase) => testCase.project)
   testCases: TestCase[];
 
-  @OneToMany(() => TestExecution, testExecution => testExecution.project)
+  @OneToMany(() => TestExecution, (testExecution) => testExecution.project)
   testExecutions: TestExecution[];
 
-  @OneToMany(() => AiGeneratedTest, aiGeneratedTest => aiGeneratedTest.project)
+  @OneToMany(() => AiGeneratedTest, (aiGeneratedTest) => aiGeneratedTest.project)
   aiGeneratedTests: AiGeneratedTest[];
 
-  @OneToMany(() => ScheduledExecution, scheduledExecution => scheduledExecution.project)
+  @OneToMany(() => ScheduledExecution, (scheduledExecution) => scheduledExecution.project)
   scheduledExecutions: ScheduledExecution[];
 
-  @OneToMany(() => Report, report => report.project)
+  @OneToMany(() => Report, (report) => report.project)
   reports: Report[];
 }

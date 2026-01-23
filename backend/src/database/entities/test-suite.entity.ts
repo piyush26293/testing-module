@@ -1,4 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { User } from './user.entity';
 import { TestCase } from './test-case.entity';
@@ -39,27 +50,27 @@ export class TestSuite {
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => Project, project => project.testSuites, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.testSuites, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => TestSuite, testSuite => testSuite.childSuites, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestSuite, (testSuite) => testSuite.childSuites, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'parentSuiteId' })
   parentSuite: TestSuite;
 
-  @OneToMany(() => TestSuite, testSuite => testSuite.parentSuite)
+  @OneToMany(() => TestSuite, (testSuite) => testSuite.parentSuite)
   childSuites: TestSuite[];
 
-  @ManyToOne(() => User, user => user.createdTestSuites, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.createdTestSuites, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdBy' })
   createdByUser: User;
 
-  @OneToMany(() => TestCase, testCase => testCase.suite)
+  @OneToMany(() => TestCase, (testCase) => testCase.suite)
   testCases: TestCase[];
 
-  @OneToMany(() => TestExecution, testExecution => testExecution.suite)
+  @OneToMany(() => TestExecution, (testExecution) => testExecution.suite)
   testExecutions: TestExecution[];
 
-  @OneToMany(() => ScheduledExecution, scheduledExecution => scheduledExecution.suite)
+  @OneToMany(() => ScheduledExecution, (scheduledExecution) => scheduledExecution.suite)
   scheduledExecutions: ScheduledExecution[];
 }

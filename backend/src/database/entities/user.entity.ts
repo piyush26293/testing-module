@@ -1,4 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Organization } from './organization.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { ApiKey } from './api-key.entity';
@@ -18,7 +29,7 @@ export enum UserRole {
   QA_LEAD = 'qa_lead',
   QA_ENGINEER = 'qa_engineer',
   DEVELOPER = 'developer',
-  VIEWER = 'viewer'
+  VIEWER = 'viewer',
 }
 
 @Entity('users')
@@ -72,43 +83,43 @@ export class User {
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => Organization, organization => organization.users, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Organization, (organization) => organization.users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })
   organization: Organization;
 
-  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshToken[];
 
-  @OneToMany(() => ApiKey, apiKey => apiKey.user)
+  @OneToMany(() => ApiKey, (apiKey) => apiKey.user)
   apiKeys: ApiKey[];
 
-  @OneToMany(() => Project, project => project.createdByUser)
+  @OneToMany(() => Project, (project) => project.createdByUser)
   createdProjects: Project[];
 
-  @OneToMany(() => ProjectMember, projectMember => projectMember.user)
+  @OneToMany(() => ProjectMember, (projectMember) => projectMember.user)
   projectMemberships: ProjectMember[];
 
-  @OneToMany(() => TestSuite, testSuite => testSuite.createdByUser)
+  @OneToMany(() => TestSuite, (testSuite) => testSuite.createdByUser)
   createdTestSuites: TestSuite[];
 
-  @OneToMany(() => TestCase, testCase => testCase.createdByUser)
+  @OneToMany(() => TestCase, (testCase) => testCase.createdByUser)
   createdTestCases: TestCase[];
 
-  @OneToMany(() => TestExecution, testExecution => testExecution.triggeredByUser)
+  @OneToMany(() => TestExecution, (testExecution) => testExecution.triggeredByUser)
   triggeredExecutions: TestExecution[];
 
-  @OneToMany(() => AiGeneratedTest, aiGeneratedTest => aiGeneratedTest.createdByUser)
+  @OneToMany(() => AiGeneratedTest, (aiGeneratedTest) => aiGeneratedTest.createdByUser)
   createdAiTests: AiGeneratedTest[];
 
-  @OneToMany(() => AiGeneratedTest, aiGeneratedTest => aiGeneratedTest.approvedByUser)
+  @OneToMany(() => AiGeneratedTest, (aiGeneratedTest) => aiGeneratedTest.approvedByUser)
   approvedAiTests: AiGeneratedTest[];
 
-  @OneToMany(() => ScheduledExecution, scheduledExecution => scheduledExecution.createdByUser)
+  @OneToMany(() => ScheduledExecution, (scheduledExecution) => scheduledExecution.createdByUser)
   createdScheduledExecutions: ScheduledExecution[];
 
-  @OneToMany(() => Report, report => report.generatedByUser)
+  @OneToMany(() => Report, (report) => report.generatedByUser)
   generatedReports: Report[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.user)
+  @OneToMany(() => AuditLog, (auditLog) => auditLog.user)
   auditLogs: AuditLog[];
 }

@@ -7,7 +7,12 @@ export { ProjectMember } from './project-member.entity';
 export { TestSuite } from './test-suite.entity';
 export { TestCase, TestCaseStatus, TestCasePriority } from './test-case.entity';
 export { TestStep, StepType, LocatorStrategy } from './test-step.entity';
-export { TestExecution, ExecutionStatus, ExecutionTrigger, BrowserType } from './test-execution.entity';
+export {
+  TestExecution,
+  ExecutionStatus,
+  ExecutionTrigger,
+  BrowserType,
+} from './test-execution.entity';
 export { ExecutionLog } from './execution-log.entity';
 export { Screenshot } from './screenshot.entity';
 export { AiGeneratedTest } from './ai-generated-test.entity';

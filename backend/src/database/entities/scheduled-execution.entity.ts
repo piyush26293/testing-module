@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { TestSuite } from './test-suite.entity';
 import { User } from './user.entity';
@@ -54,15 +63,17 @@ export class ScheduledExecution {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
-  @ManyToOne(() => Project, project => project.scheduledExecutions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.scheduledExecutions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => TestSuite, testSuite => testSuite.scheduledExecutions, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestSuite, (testSuite) => testSuite.scheduledExecutions, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'suiteId' })
   suite: TestSuite;
 
-  @ManyToOne(() => User, user => user.createdScheduledExecutions, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.createdScheduledExecutions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdBy' })
   createdByUser: User;
 }

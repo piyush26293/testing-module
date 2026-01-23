@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+  Unique,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { User } from './user.entity';
 import { UserRole } from './user.entity';
@@ -23,11 +32,11 @@ export class ProjectMember {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   joinedAt: Date;
 
-  @ManyToOne(() => Project, project => project.members, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.members, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => User, user => user.projectMemberships, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.projectMemberships, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

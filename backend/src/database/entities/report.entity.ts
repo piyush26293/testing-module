@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { User } from './user.entity';
 
@@ -43,11 +51,11 @@ export class Report {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @ManyToOne(() => Project, project => project.reports, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.reports, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => User, user => user.generatedReports, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.generatedReports, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'generatedBy' })
   generatedByUser: User;
 }

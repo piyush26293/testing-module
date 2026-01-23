@@ -1,4 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { TestSuite } from './test-suite.entity';
 import { User } from './user.entity';
@@ -10,14 +21,14 @@ export enum TestCaseStatus {
   DRAFT = 'draft',
   ACTIVE = 'active',
   DEPRECATED = 'deprecated',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 export enum TestCasePriority {
   CRITICAL = 'critical',
   HIGH = 'high',
   MEDIUM = 'medium',
-  LOW = 'low'
+  LOW = 'low',
 }
 
 @Entity('test_cases')
@@ -85,24 +96,24 @@ export class TestCase {
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => Project, project => project.testCases, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.testCases, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => TestSuite, testSuite => testSuite.testCases, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestSuite, (testSuite) => testSuite.testCases, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'suiteId' })
   suite: TestSuite;
 
-  @ManyToOne(() => User, user => user.createdTestCases, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.createdTestCases, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'createdBy' })
   createdByUser: User;
 
-  @OneToMany(() => TestStep, testStep => testStep.testCase)
+  @OneToMany(() => TestStep, (testStep) => testStep.testCase)
   steps: TestStep[];
 
-  @OneToMany(() => TestExecution, testExecution => testExecution.testCase)
+  @OneToMany(() => TestExecution, (testExecution) => testExecution.testCase)
   executions: TestExecution[];
 
-  @OneToMany(() => AiGeneratedTest, aiGeneratedTest => aiGeneratedTest.testCase)
+  @OneToMany(() => AiGeneratedTest, (aiGeneratedTest) => aiGeneratedTest.testCase)
   aiGeneratedTests: AiGeneratedTest[];
 }

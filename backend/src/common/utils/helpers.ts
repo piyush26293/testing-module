@@ -1,9 +1,4 @@
-export function createPaginatedResponse<T>(
-  data: T[],
-  total: number,
-  page: number,
-  limit: number,
-) {
+export function createPaginatedResponse<T>(data: T[], total: number, page: number, limit: number) {
   const totalPages = Math.ceil(total / limit);
 
   return {

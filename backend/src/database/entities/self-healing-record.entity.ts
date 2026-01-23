@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { TestExecution } from './test-execution.entity';
 import { TestStep, LocatorStrategy } from './test-step.entity';
 
@@ -36,11 +44,13 @@ export class SelfHealingRecord {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @ManyToOne(() => TestExecution, testExecution => testExecution.selfHealingRecords, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TestExecution, (testExecution) => testExecution.selfHealingRecords, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'executionId' })
   execution: TestExecution;
 
-  @ManyToOne(() => TestStep, testStep => testStep.selfHealingRecords, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestStep, (testStep) => testStep.selfHealingRecords, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'stepId' })
   step: TestStep;
 }

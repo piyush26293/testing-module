@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Project } from './project.entity';
 import { TestCase } from './test-case.entity';
 import { TestSuite } from './test-suite.entity';
@@ -13,14 +23,14 @@ export enum ExecutionStatus {
   PASSED = 'passed',
   FAILED = 'failed',
   SKIPPED = 'skipped',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 export enum ExecutionTrigger {
   MANUAL = 'manual',
   SCHEDULED = 'scheduled',
   CI_CD = 'ci_cd',
-  API = 'api'
+  API = 'api',
 }
 
 export enum BrowserType {
@@ -28,7 +38,7 @@ export enum BrowserType {
   FIREFOX = 'firefox',
   WEBKIT = 'webkit',
   CHROME = 'chrome',
-  EDGE = 'edge'
+  EDGE = 'edge',
 }
 
 @Entity('test_executions')
@@ -96,28 +106,28 @@ export class TestExecution {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
-  @ManyToOne(() => Project, project => project.testExecutions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Project, (project) => project.testExecutions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
-  @ManyToOne(() => TestCase, testCase => testCase.executions, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestCase, (testCase) => testCase.executions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'testCaseId' })
   testCase: TestCase;
 
-  @ManyToOne(() => TestSuite, testSuite => testSuite.testExecutions, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestSuite, (testSuite) => testSuite.testExecutions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'suiteId' })
   suite: TestSuite;
 
-  @ManyToOne(() => User, user => user.triggeredExecutions, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.triggeredExecutions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'triggeredBy' })
   triggeredByUser: User;
 
-  @OneToMany(() => ExecutionLog, executionLog => executionLog.execution)
+  @OneToMany(() => ExecutionLog, (executionLog) => executionLog.execution)
   logs: ExecutionLog[];
 
-  @OneToMany(() => Screenshot, screenshot => screenshot.execution)
+  @OneToMany(() => Screenshot, (screenshot) => screenshot.execution)
   screenshots: Screenshot[];
 
-  @OneToMany(() => SelfHealingRecord, selfHealingRecord => selfHealingRecord.execution)
+  @OneToMany(() => SelfHealingRecord, (selfHealingRecord) => selfHealingRecord.execution)
   selfHealingRecords: SelfHealingRecord[];
 }

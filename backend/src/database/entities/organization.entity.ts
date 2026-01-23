@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  OneToMany,
+  Index,
+} from 'typeorm';
 import { User } from './user.entity';
 import { Project } from './project.entity';
 import { AuditLog } from './audit-log.entity';
@@ -37,12 +46,12 @@ export class Organization {
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
   deletedAt: Date;
 
-  @OneToMany(() => User, user => user.organization)
+  @OneToMany(() => User, (user) => user.organization)
   users: User[];
 
-  @OneToMany(() => Project, project => project.organization)
+  @OneToMany(() => Project, (project) => project.organization)
   projects: Project[];
 
-  @OneToMany(() => AuditLog, auditLog => auditLog.organization)
+  @OneToMany(() => AuditLog, (auditLog) => auditLog.organization)
   auditLogs: AuditLog[];
 }

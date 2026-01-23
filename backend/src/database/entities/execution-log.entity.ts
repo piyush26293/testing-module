@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { TestExecution, ExecutionStatus } from './test-execution.entity';
 import { TestStep } from './test-step.entity';
 import { Screenshot } from './screenshot.entity';
@@ -44,14 +53,14 @@ export class ExecutionLog {
   @Column({ type: 'jsonb', default: {} })
   metadata: object;
 
-  @ManyToOne(() => TestExecution, testExecution => testExecution.logs, { onDelete: 'CASCADE' })
+  @ManyToOne(() => TestExecution, (testExecution) => testExecution.logs, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'executionId' })
   execution: TestExecution;
 
-  @ManyToOne(() => TestStep, testStep => testStep.executionLogs, { onDelete: 'SET NULL' })
+  @ManyToOne(() => TestStep, (testStep) => testStep.executionLogs, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'stepId' })
   step: TestStep;
 
-  @OneToMany(() => Screenshot, screenshot => screenshot.log)
+  @OneToMany(() => Screenshot, (screenshot) => screenshot.log)
   screenshots: Screenshot[];
 }

@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { User } from './user.entity';
 import { Organization } from './organization.entity';
 
@@ -42,11 +50,11 @@ export class AuditLog {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @ManyToOne(() => User, user => user.auditLogs, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.auditLogs, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Organization, organization => organization.auditLogs, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Organization, (organization) => organization.auditLogs, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })
   organization: Organization;
 }

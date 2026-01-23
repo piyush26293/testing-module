@@ -1,0 +1,220 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai-testing-postgres-prod
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - testing-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ai-testing-redis-prod
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - testing-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: ai-testing-minio-prod
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data_prod:/data
+    networks:
+      - testing-network
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Backend API Service - Production
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../devops/docker/backend/Dockerfile
+      target: production
+    image: ${DOCKER_REGISTRY}/ai-testing-backend:${VERSION:-latest}
+    container_name: ai-testing-backend-prod
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_USE_SSL: 'false'
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: 3001
+      LOG_LEVEL: info
+    networks:
+      - testing-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # Frontend Service - Production
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../devops/docker/frontend/Dockerfile
+      target: production
+    image: ${DOCKER_REGISTRY}/ai-testing-frontend:${VERSION:-latest}
+    container_name: ai-testing-frontend-prod
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${FRONTEND_URL}/api
+    networks:
+      - testing-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Nginx Reverse Proxy
+  nginx:
+    build:
+      context: ./devops/docker/nginx
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY}/ai-testing-nginx:${VERSION:-latest}
+    container_name: ai-testing-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - testing-network
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Test Runner (on-demand)
+  runner:
+    build:
+      context: ./runner
+      dockerfile: ../devops/docker/runner/Dockerfile
+    image: ${DOCKER_REGISTRY}/ai-testing-runner:${VERSION:-latest}
+    container_name: ai-testing-runner-prod
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: http://backend:3001
+      PLAYWRIGHT_HEADLESS: 'true'
+    volumes:
+      - test_results:/app/test-results
+      - test_artifacts:/app/test-artifacts
+    networks:
+      - testing-network
+    depends_on:
+      - backend
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+networks:
+  testing-network:
+    driver: bridge
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  minio_data_prod:
+  test_results:
+  test_artifacts:

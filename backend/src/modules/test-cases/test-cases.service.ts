@@ -7,7 +7,8 @@ import { CreateTestCaseDto } from './dto/create-test-case.dto';
 import { UpdateTestCaseDto } from './dto/update-test-case.dto';
 import { TestStepDto } from './dto/test-step.dto';
 import { TestCaseFiltersDto } from './dto/test-case-filters.dto';
-import { PaginatedResult, createPaginatedResponse } from '../../common/dto/pagination.dto';
+import { PaginatedResult } from '../../common/dto/pagination.dto';
+import { createPaginatedResponse } from '../../common/utils/helpers';
 import { ProjectsService } from '../projects/projects.service';
 
 @Injectable()

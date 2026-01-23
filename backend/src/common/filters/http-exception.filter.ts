@@ -14,8 +14,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = response.status(status).json(errorResponse);
     const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
 
     const status =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -43,6 +43,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       );
     }
 
-    ctx.getResponse<Response>().status(status).json(errorResponse);
+    response.status(status).json(errorResponse);
   }
 }

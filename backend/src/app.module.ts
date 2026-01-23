@@ -17,7 +17,7 @@ import { TestCasesModule } from './modules/test-cases/test-cases.module';
 import { TestSuitesModule } from './modules/test-suites/test-suites.module';
 import { ExecutionsModule } from './modules/executions/executions.module';
 import { StorageModule } from './modules/storage/storage.module';
-// import { ReportsModule } from './modules/reports/reports.module';
+import { ReportsModule } from './modules/reports/reports.module';
 // import { AiEngineModule } from './modules/ai-engine/ai-engine.module';
 // import { AuditModule } from './modules/audit/audit.module';
 // import { HealthModule } from './modules/health/health.module';
@@ -50,7 +50,7 @@ import { StorageModule } from './modules/storage/storage.module';
     TestCasesModule,
     TestSuitesModule,
     ExecutionsModule,
-    // ReportsModule,
+    ReportsModule,
     StorageModule,
     // AiEngineModule,
     // AuditModule,

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Backup PostgreSQL Database
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'

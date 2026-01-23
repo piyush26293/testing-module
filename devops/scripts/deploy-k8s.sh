@@ -1,7 +1,7 @@
 #!/bin/bash
 # Deploy to Kubernetes
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'

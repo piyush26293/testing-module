@@ -191,17 +191,17 @@ ingress:
 secrets:
   database:
     user: postgres
-    password: change-this-in-production
+    password: REPLACE_WITH_SECURE_PASSWORD
   jwt:
-    secret: change-this-to-a-secure-random-string
-    refreshSecret: change-this-to-another-secure-random-string
+    secret: REPLACE_WITH_SECURE_RANDOM_STRING
+    refreshSecret: REPLACE_WITH_SECURE_RANDOM_STRING
   minio:
     rootUser: minioadmin
-    rootPassword: change-this-in-production
+    rootPassword: REPLACE_WITH_SECURE_PASSWORD
     accessKey: minioadmin
-    secretKey: change-this-in-production
+    secretKey: REPLACE_WITH_SECURE_PASSWORD
   openai:
-    apiKey: your-openai-api-key-here
+    apiKey: REPLACE_WITH_OPENAI_API_KEY
     model: gpt-4
     maxTokens: "2000"
 

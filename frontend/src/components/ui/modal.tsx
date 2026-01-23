@@ -28,6 +28,9 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', className
 
   if (!isOpen) return null;
 
+  // Check if we're in the browser before using document.body
+  if (typeof window === 'undefined') return null;
+
   const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div

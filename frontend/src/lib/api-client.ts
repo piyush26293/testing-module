@@ -35,11 +35,9 @@ class ApiClient {
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
-          // Handle unauthorized - clear token and redirect to login
+          // Handle unauthorized - clear token
+          // The ProtectedRoute component will handle the redirect
           this.clearToken();
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
         }
         return Promise.reject(error);
       }

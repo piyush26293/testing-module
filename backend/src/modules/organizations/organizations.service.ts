@@ -29,11 +29,18 @@ export class OrganizationsService {
   }
 
   private async ensureSlugUniqueness(slug: string, excludeId?: string): Promise<void> {
-    const existingOrg = await this.organizationRepository.findOne({
-      where: { slug },
-    });
+    const queryBuilder = this.organizationRepository
+      .createQueryBuilder('organization')
+      .where('organization.slug = :slug', { slug })
+      .andWhere('organization.deletedAt IS NULL');
 
-    if (existingOrg && existingOrg.id !== excludeId) {
+    if (excludeId) {
+      queryBuilder.andWhere('organization.id != :excludeId', { excludeId });
+    }
+
+    const existingOrg = await queryBuilder.getOne();
+
+    if (existingOrg) {
       throw new ConflictException('Organization with this name already exists');
     }
   }

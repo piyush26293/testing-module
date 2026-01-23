@@ -1,5 +1,5 @@
 # Playwright Test Runner with all browsers
-FROM mcr.microsoft.com/playwright:v1.40.0-jammy
+FROM mcr.microsoft.com/playwright:v1.58.0-jammy
 
 # Set working directory
 WORKDIR /app

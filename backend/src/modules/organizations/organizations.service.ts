@@ -17,13 +17,7 @@ export class OrganizationsService {
   async create(createOrganizationDto: CreateOrganizationDto): Promise<Organization> {
     const slug = slugify(createOrganizationDto.name);
 
-    const existingOrg = await this.organizationRepository.findOne({
-      where: { slug },
-    });
-
-    if (existingOrg) {
-      throw new ConflictException('Organization with this name already exists');
-    }
+    await this.ensureSlugUniqueness(slug);
 
     const organization = this.organizationRepository.create({
       ...createOrganizationDto,
@@ -34,13 +28,25 @@ export class OrganizationsService {
     return this.organizationRepository.save(organization);
   }
 
+  private async ensureSlugUniqueness(slug: string, excludeId?: string): Promise<void> {
+    const existingOrg = await this.organizationRepository.findOne({
+      where: { slug },
+    });
+
+    if (existingOrg && existingOrg.id !== excludeId) {
+      throw new ConflictException('Organization with this name already exists');
+    }
+  }
+
   async findAll(
     pagination: PaginationDto,
     organizationId?: string,
   ): Promise<PaginatedResult<Organization>> {
     const { page = 1, limit = 10 } = pagination;
 
-    const queryBuilder = this.organizationRepository.createQueryBuilder('organization');
+    const queryBuilder = this.organizationRepository
+      .createQueryBuilder('organization')
+      .where('organization.deletedAt IS NULL');
 
     if (organizationId) {
       queryBuilder.andWhere('organization.id = :organizationId', { organizationId });
@@ -98,15 +104,7 @@ export class OrganizationsService {
 
     if (updateOrganizationDto.name && updateOrganizationDto.name !== organization.name) {
       const newSlug = slugify(updateOrganizationDto.name);
-      
-      const existingOrg = await this.organizationRepository.findOne({
-        where: { slug: newSlug },
-      });
-
-      if (existingOrg && existingOrg.id !== id) {
-        throw new ConflictException('Organization with this name already exists');
-      }
-
+      await this.ensureSlugUniqueness(newSlug, id);
       organization.slug = newSlug;
     }
 

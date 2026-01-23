@@ -12,7 +12,8 @@ export class AuthService {
     };
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async validateUser(username: string, _password: string): Promise<any> {
     // Simplified validation for MVP
     // In production, this should check against database with bcrypt
     return { userId: 1, username };

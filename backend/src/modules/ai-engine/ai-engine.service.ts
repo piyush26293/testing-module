@@ -27,10 +27,7 @@ export class AiEngineService {
       throw new BadRequestException('OpenAI API key not configured');
     }
 
-    const prompt = TEST_GENERATION_PROMPT.replace(
-      '{{USER_FLOW}}',
-      dto.userFlow,
-    )
+    const prompt = TEST_GENERATION_PROMPT.replace('{{USER_FLOW}}', dto.userFlow)
       .replace('{{URL}}', dto.url || '')
       .replace('{{FRAMEWORK}}', dto.framework || 'playwright');
 
@@ -72,8 +69,7 @@ export class AiEngineService {
         messages: [
           {
             role: 'system',
-            content:
-              'You are an expert in web accessibility and test automation.',
+            content: 'You are an expert in web accessibility and test automation.',
           },
           { role: 'user', content: prompt },
         ],
@@ -98,10 +94,7 @@ export class AiEngineService {
       throw new BadRequestException('OpenAI API key not configured');
     }
 
-    const prompt = SELF_HEALING_PROMPT.replace(
-      '{{BROKEN_LOCATOR}}',
-      dto.brokenLocator,
-    )
+    const prompt = SELF_HEALING_PROMPT.replace('{{BROKEN_LOCATOR}}', dto.brokenLocator)
       .replace('{{ERROR_MESSAGE}}', dto.errorMessage)
       .replace('{{DOM_SNAPSHOT}}', dto.domSnapshot);
 
@@ -128,9 +121,7 @@ export class AiEngineService {
         confidence: this.calculateConfidence(suggestion),
       };
     } catch (error) {
-      throw new BadRequestException(
-        'Failed to suggest self-healing: ' + error.message,
-      );
+      throw new BadRequestException('Failed to suggest self-healing: ' + error.message);
     }
   }
 
@@ -162,9 +153,7 @@ export class AiEngineService {
         recommendations: edgeCases,
       };
     } catch (error) {
-      throw new BadRequestException(
-        'Failed to suggest edge cases: ' + error.message,
-      );
+      throw new BadRequestException('Failed to suggest edge cases: ' + error.message);
     }
   }
 
@@ -179,7 +168,6 @@ export class AiEngineService {
 
   private extractKeyElements(domTree: string): any[] {
     // Simple extraction of interactive elements
-    const elements = [];
     const buttonRegex = /<button[^>]*>.*?<\/button>/gi;
     const inputRegex = /<input[^>]*>/gi;
     const linkRegex = /<a[^>]*>.*?<\/a>/gi;
@@ -220,8 +208,7 @@ export class AiEngineService {
 
   private calculateConfidence(suggestion: string): number {
     // Simple confidence calculation based on suggestion quality
-    const hasMultipleLocators = (suggestion.match(/data-testid|id=|getBy/g) || [])
-      .length;
+    const hasMultipleLocators = (suggestion.match(/data-testid|id=|getBy/g) || []).length;
     const hasExplanation = suggestion.length > 100;
     const hasCode = suggestion.includes('```');
 

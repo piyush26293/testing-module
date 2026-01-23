@@ -77,13 +77,13 @@ export class BrowserManager implements OnModuleDestroy {
 
   async onModuleDestroy() {
     // Close all contexts
-    for (const [contextId, context] of this.contexts.entries()) {
+    for (const context of this.contexts.values()) {
       await context.close();
     }
     this.contexts.clear();
 
     // Close all browsers
-    for (const [browserType, browser] of this.browsers.entries()) {
+    for (const browser of this.browsers.values()) {
       await browser.close();
     }
     this.browsers.clear();

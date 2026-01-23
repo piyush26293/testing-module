@@ -25,9 +25,7 @@ async function bootstrap() {
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('AI-Powered Testing Platform API')
-    .setDescription(
-      'API documentation for the AI-Powered Testing Platform backend',
-    )
+    .setDescription('API documentation for the AI-Powered Testing Platform backend')
     .setVersion('1.0')
     .addBearerAuth()
     .addTag('auth', 'Authentication endpoints')

@@ -35,17 +35,11 @@ export class StorageService implements OnModuleInit {
     folder: 'screenshots' | 'videos' | 'reports',
   ): Promise<string> {
     const fileName = `${folder}/${Date.now()}-${file.originalname}`;
-    
+
     try {
-      await this.minioClient.putObject(
-        this.bucketName,
-        fileName,
-        file.buffer,
-        file.size,
-        {
-          'Content-Type': file.mimetype,
-        },
-      );
+      await this.minioClient.putObject(this.bucketName, fileName, file.buffer, file.size, {
+        'Content-Type': file.mimetype,
+      });
       return fileName;
     } catch (error) {
       throw new BadRequestException('Failed to upload file');
@@ -59,17 +53,11 @@ export class StorageService implements OnModuleInit {
     folder: 'screenshots' | 'videos' | 'reports',
   ): Promise<string> {
     const fullPath = `${folder}/${Date.now()}-${fileName}`;
-    
+
     try {
-      await this.minioClient.putObject(
-        this.bucketName,
-        fullPath,
-        buffer,
-        buffer.length,
-        {
-          'Content-Type': contentType,
-        },
-      );
+      await this.minioClient.putObject(this.bucketName, fullPath, buffer, buffer.length, {
+        'Content-Type': contentType,
+      });
       return fullPath;
     } catch (error) {
       throw new BadRequestException('Failed to upload buffer');
@@ -108,11 +96,7 @@ export class StorageService implements OnModuleInit {
 
   async listFiles(folder?: string): Promise<string[]> {
     const files: string[] = [];
-    const stream = this.minioClient.listObjects(
-      this.bucketName,
-      folder || '',
-      true,
-    );
+    const stream = this.minioClient.listObjects(this.bucketName, folder || '', true);
 
     return new Promise((resolve, reject) => {
       stream.on('data', (obj) => files.push(obj.name));

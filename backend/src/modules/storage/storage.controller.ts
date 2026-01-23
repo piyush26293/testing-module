@@ -22,7 +22,6 @@ import {
 } from '@nestjs/swagger';
 import { StorageService } from './storage.service';
 import { JwtAuthGuard } from '../../common/guards';
-import { UploadFileDto } from './dto/upload-file.dto';
 
 @ApiTags('storage')
 @ApiBearerAuth()
@@ -93,10 +92,7 @@ export class StorageController {
 
   @Get('download/:folder/:filename')
   @ApiOperation({ summary: 'Download a file' })
-  async downloadFile(
-    @Param('folder') folder: string,
-    @Param('filename') filename: string,
-  ) {
+  async downloadFile(@Param('folder') folder: string, @Param('filename') filename: string) {
     const fullPath = `${folder}/${filename}`;
     const stream = await this.storageService.getFile(fullPath);
     return new StreamableFile(stream);
@@ -111,19 +107,13 @@ export class StorageController {
     @Query('expiry') expiry?: number,
   ) {
     const fullPath = `${folder}/${filename}`;
-    const url = await this.storageService.getPresignedUrl(
-      fullPath,
-      expiry || 3600,
-    );
+    const url = await this.storageService.getPresignedUrl(fullPath, expiry || 3600);
     return { url };
   }
 
   @Delete(':folder/:filename')
   @ApiOperation({ summary: 'Delete a file' })
-  async deleteFile(
-    @Param('folder') folder: string,
-    @Param('filename') filename: string,
-  ) {
+  async deleteFile(@Param('folder') folder: string, @Param('filename') filename: string) {
     const fullPath = `${folder}/${filename}`;
     await this.storageService.deleteFile(fullPath);
     return { message: 'File deleted successfully' };

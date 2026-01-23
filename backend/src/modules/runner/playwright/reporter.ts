@@ -68,9 +68,7 @@ export class PlaywrightReporter {
   }
 
   generateHtmlReport(report: TestReport): string {
-    const duration = report.endTime
-      ? report.endTime.getTime() - report.startTime.getTime()
-      : 0;
+    const duration = report.endTime ? report.endTime.getTime() - report.startTime.getTime() : 0;
 
     return `
 <!DOCTYPE html>
@@ -94,20 +92,28 @@ export class PlaywrightReporter {
   </div>
   <div class="steps">
     <h2>Steps</h2>
-    ${report.steps.map((step) => `
+    ${report.steps
+      .map(
+        (step) => `
       <div class="step">
         <strong>${step.name}</strong> - <span class="${step.status}">${step.status}</span>
         (${step.duration}ms)
         ${step.error ? `<p class="failed">Error: ${step.error}</p>` : ''}
       </div>
-    `).join('')}
+    `,
+      )
+      .join('')}
   </div>
-  ${report.errors.length > 0 ? `
+  ${
+    report.errors.length > 0
+      ? `
     <div class="errors">
       <h2>Errors</h2>
       ${report.errors.map((error) => `<p class="failed">${error}</p>`).join('')}
     </div>
-  ` : ''}
+  `
+      : ''
+  }
 </body>
 </html>
     `;

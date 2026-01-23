@@ -104,19 +104,15 @@ export class TestExecutor {
   }
 
   private async captureScreenshot(page: Page, name: string): Promise<string> {
-    const screenshotBuffer = await page.screenshot({ fullPage: false });
+    await page.screenshot({ fullPage: false });
     const filename = `screenshot-${name}-${Date.now()}.png`;
-    
+
     // In production, you'd upload this to storage service
     // For now, return the filename
     return filename;
   }
 
-  async executeCustomScript(
-    page: Page,
-    script: string,
-    context?: any,
-  ): Promise<any> {
+  async executeCustomScript(page: Page, script: string, context?: any): Promise<any> {
     try {
       return await page.evaluate(script, context);
     } catch (error) {

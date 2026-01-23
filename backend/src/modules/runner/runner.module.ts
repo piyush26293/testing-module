@@ -15,12 +15,7 @@ import { PlaywrightReporter } from './playwright/reporter';
     }),
   ],
   controllers: [RunnerController],
-  providers: [
-    RunnerService,
-    BrowserManager,
-    TestExecutor,
-    PlaywrightReporter,
-  ],
+  providers: [RunnerService, BrowserManager, TestExecutor, PlaywrightReporter],
   exports: [RunnerService],
 })
 export class RunnerModule {}

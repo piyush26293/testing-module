@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runner
+  namespace: ai-testing-platform
+  labels:
+    app: runner
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: runner
+  template:
+    metadata:
+      labels:
+        app: runner
+        version: v1
+    spec:
+      containers:
+        - name: runner
+          image: your-registry/ai-testing-runner:latest
+          imagePullPolicy: Always
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: BACKEND_URL
+              value: "http://backend-service:3001"
+            - name: PLAYWRIGHT_HEADLESS
+              value: "true"
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+          volumeMounts:
+            - name: test-results
+              mountPath: /app/test-results
+            - name: test-artifacts
+              mountPath: /app/test-artifacts
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: test-results
+          emptyDir: {}
+        - name: test-artifacts
+          emptyDir: {}

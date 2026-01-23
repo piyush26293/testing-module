@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ai-testing-platform
+
+resources:
+  - namespace.yaml
+  - configmaps/backend-config.yaml
+  - configmaps/frontend-config.yaml
+  - secrets/database-secret.yaml
+  - secrets/jwt-secret.yaml
+  - secrets/minio-secret.yaml
+  - secrets/openai-secret.yaml
+  - pvc/postgres-pvc.yaml
+  - pvc/minio-pvc.yaml
+  - deployments/postgres-deployment.yaml
+  - deployments/redis-deployment.yaml
+  - deployments/minio-deployment.yaml
+  - deployments/backend-deployment.yaml
+  - deployments/frontend-deployment.yaml
+  - deployments/runner-deployment.yaml
+  - services/postgres-service.yaml
+  - services/redis-service.yaml
+  - services/minio-service.yaml
+  - services/backend-service.yaml
+  - services/frontend-service.yaml
+  - ingress/ingress.yaml
+  - hpa/backend-hpa.yaml
+  - hpa/runner-hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/name: ai-testing-platform
+  app.kubernetes.io/part-of: testing-platform
+
+images:
+  - name: your-registry/ai-testing-backend
+    newTag: latest
+  - name: your-registry/ai-testing-frontend
+    newTag: latest
+  - name: your-registry/ai-testing-runner
+    newTag: latest

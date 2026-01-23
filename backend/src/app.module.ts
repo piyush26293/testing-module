@@ -16,11 +16,11 @@ import { ProjectsModule } from './modules/projects/projects.module';
 import { TestCasesModule } from './modules/test-cases/test-cases.module';
 import { TestSuitesModule } from './modules/test-suites/test-suites.module';
 import { ExecutionsModule } from './modules/executions/executions.module';
-import { ReportsModule } from './modules/reports/reports.module';
 import { StorageModule } from './modules/storage/storage.module';
-import { AiEngineModule } from './modules/ai-engine/ai-engine.module';
-import { AuditModule } from './modules/audit/audit.module';
-import { HealthModule } from './modules/health/health.module';
+// import { ReportsModule } from './modules/reports/reports.module';
+// import { AiEngineModule } from './modules/ai-engine/ai-engine.module';
+// import { AuditModule } from './modules/audit/audit.module';
+// import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -42,7 +42,7 @@ import { HealthModule } from './modules/health/health.module';
         },
       }),
     }),
-    HealthModule,
+    // HealthModule,
     AuthModule,
     UsersModule,
     OrganizationsModule,
@@ -50,10 +50,10 @@ import { HealthModule } from './modules/health/health.module';
     TestCasesModule,
     TestSuitesModule,
     ExecutionsModule,
-    ReportsModule,
+    // ReportsModule,
     StorageModule,
-    AiEngineModule,
-    AuditModule,
+    // AiEngineModule,
+    // AuditModule,
   ],
 })
 export class AppModule {}

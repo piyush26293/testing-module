@@ -54,6 +54,7 @@ Thumbs.db
 
 # MinIO/S3 local storage
 storage/
+!backend/src/modules/storage/
 uploads/
 
 # Playwright browsers

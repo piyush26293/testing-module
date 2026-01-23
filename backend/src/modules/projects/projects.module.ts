@@ -7,9 +7,7 @@ import { ProjectMember } from '../../database/entities/project-member.entity';
 import { User } from '../../database/entities/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Project, ProjectMember, User]),
-  ],
+  imports: [TypeOrmModule.forFeature([Project, ProjectMember, User])],
   controllers: [ProjectsController],
   providers: [ProjectsService],
   exports: [ProjectsService],

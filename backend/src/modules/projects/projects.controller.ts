@@ -32,11 +32,11 @@ export class ProjectsController {
   @ApiResponse({ status: 201, description: 'Project created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 409, description: 'Project with this name already exists in the organization' })
-  async create(
-    @Body() createProjectDto: CreateProjectDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  @ApiResponse({
+    status: 409,
+    description: 'Project with this name already exists in the organization',
+  })
+  async create(@Body() createProjectDto: CreateProjectDto, @CurrentUser('id') userId: string) {
     return this.projectsService.create(createProjectDto, userId);
   }
 
@@ -60,10 +60,7 @@ export class ProjectsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to this project' })
   @ApiResponse({ status: 404, description: 'Project not found' })
-  async findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     return this.projectsService.findOne(id, userId);
   }
 
@@ -75,7 +72,10 @@ export class ProjectsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Only admins can update' })
   @ApiResponse({ status: 404, description: 'Project not found' })
-  @ApiResponse({ status: 409, description: 'Project with this name already exists in the organization' })
+  @ApiResponse({
+    status: 409,
+    description: 'Project with this name already exists in the organization',
+  })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProjectDto: UpdateProjectDto,
@@ -91,10 +91,7 @@ export class ProjectsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Only admins can delete' })
   @ApiResponse({ status: 404, description: 'Project not found' })
-  async remove(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     await this.projectsService.remove(id, userId);
     return { message: 'Project deleted successfully' };
   }

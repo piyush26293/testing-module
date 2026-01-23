@@ -1,6 +1,6 @@
-import { 
-  Injectable, 
-  NotFoundException, 
+import {
+  Injectable,
+  NotFoundException,
   ConflictException,
   ForbiddenException,
   BadRequestException,
@@ -53,7 +53,11 @@ export class ProjectsService {
     });
   }
 
-  private async ensureSlugUniqueness(slug: string, organizationId: string, excludeId?: string): Promise<void> {
+  private async ensureSlugUniqueness(
+    slug: string,
+    organizationId: string,
+    excludeId?: string,
+  ): Promise<void> {
     const queryBuilder = this.projectRepository
       .createQueryBuilder('project')
       .where('project.slug = :slug', { slug })
@@ -93,10 +97,7 @@ export class ProjectsService {
         .andWhere('member.userId = :userId', { userId });
     }
 
-    queryBuilder
-      .orderBy('project.createdAt', 'DESC')
-      .skip(skip)
-      .take(limit);
+    queryBuilder.orderBy('project.createdAt', 'DESC').skip(skip).take(limit);
 
     const [projects, total] = await queryBuilder.getManyAndCount();
 
@@ -159,7 +160,11 @@ export class ProjectsService {
     await this.projectRepository.softDelete(id);
   }
 
-  async addMember(projectId: string, addMemberDto: AddMemberDto, currentUserId: string): Promise<ProjectMember> {
+  async addMember(
+    projectId: string,
+    addMemberDto: AddMemberDto,
+    currentUserId: string,
+  ): Promise<ProjectMember> {
     const project = await this.projectRepository.findOne({ where: { id: projectId } });
 
     if (!project) {
@@ -250,7 +255,7 @@ export class ProjectsService {
 
   async hasAccess(projectId: string, userId: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    
+
     if (user.role === UserRole.ADMIN) {
       return true;
     }
@@ -264,7 +269,7 @@ export class ProjectsService {
 
   private async isProjectAdmin(projectId: string, userId: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    
+
     if (user.role === UserRole.ADMIN) {
       return true;
     }

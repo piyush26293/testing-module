@@ -273,6 +273,10 @@ export class TestSuitesService {
   private async isProjectAdmin(projectId: string, userId: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
+    if (!user) {
+      return false;
+    }
+
     if (user.role === UserRole.ADMIN) {
       return true;
     }

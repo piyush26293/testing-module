@@ -34,14 +34,23 @@ export class OrganizationsService {
     return this.organizationRepository.save(organization);
   }
 
-  async findAll(pagination: PaginationDto): Promise<PaginatedResult<Organization>> {
+  async findAll(
+    pagination: PaginationDto,
+    organizationId?: string,
+  ): Promise<PaginatedResult<Organization>> {
     const { page = 1, limit = 10 } = pagination;
 
-    const [data, total] = await this.organizationRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { createdAt: 'DESC' },
-    });
+    const queryBuilder = this.organizationRepository.createQueryBuilder('organization');
+
+    if (organizationId) {
+      queryBuilder.andWhere('organization.id = :organizationId', { organizationId });
+    }
+
+    const [data, total] = await queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('organization.createdAt', 'DESC')
+      .getManyAndCount();
 
     const totalPages = Math.ceil(total / limit);
 

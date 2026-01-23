@@ -50,14 +50,8 @@ export class OrganizationsController {
     @CurrentUser('role') userRole: UserRole,
     @CurrentUser('organizationId') userOrgId: string,
   ) {
-    const result = await this.organizationsService.findAll(pagination);
-
-    if (userRole !== UserRole.ADMIN) {
-      result.data = result.data.filter(org => org.id === userOrgId);
-      result.meta.total = result.data.length;
-    }
-
-    return result;
+    const filterOrgId = userRole !== UserRole.ADMIN ? userOrgId : undefined;
+    return this.organizationsService.findAll(pagination, filterOrgId);
   }
 
   @Get(':id')

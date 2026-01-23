@@ -1,0 +1,204 @@
+name: CD - Deploy to Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+
+env:
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+  KUBE_NAMESPACE: ai-testing-platform
+
+jobs:
+  build-and-push:
+    name: Build and Push Production Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [backend, frontend, runner, nginx]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.version }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.component }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+            type=raw,value=production
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.component == 'nginx' && './devops/docker/nginx' || (matrix.component == 'runner' && './runner' || format('./{0}', matrix.component)) }}
+          file: ${{ matrix.component == 'nginx' && './devops/docker/nginx/Dockerfile' || format('./devops/docker/{0}/Dockerfile', matrix.component) }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: ${{ matrix.component == 'backend' || matrix.component == 'frontend' ? 'production' : '' }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    environment:
+      name: production
+      url: https://testing-platform.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.version }}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+          export KUBECONFIG=./kubeconfig
+
+      - name: Backup current deployment
+        run: |
+          export KUBECONFIG=./kubeconfig
+          helm get values testing-platform -n ${{ env.KUBE_NAMESPACE }} > backup-values-$(date +%Y%m%d-%H%M%S).yaml
+
+      - name: Deploy with Helm
+        run: |
+          export KUBECONFIG=./kubeconfig
+          VERSION=${{ github.event.release.tag_name || inputs.version }}
+          helm upgrade --install testing-platform ./devops/helm/testing-platform \
+            --namespace ${{ env.KUBE_NAMESPACE }} \
+            --create-namespace \
+            --values ./devops/helm/testing-platform/values-prod.yaml \
+            --set global.registry=${{ env.REGISTRY }} \
+            --set global.imageTag=${VERSION} \
+            --set secrets.database.password=${{ secrets.DB_PASSWORD_PRODUCTION }} \
+            --set secrets.jwt.secret=${{ secrets.JWT_SECRET_PRODUCTION }} \
+            --set secrets.jwt.refreshSecret=${{ secrets.JWT_REFRESH_SECRET_PRODUCTION }} \
+            --set secrets.minio.rootPassword=${{ secrets.MINIO_PASSWORD_PRODUCTION }} \
+            --set secrets.minio.secretKey=${{ secrets.MINIO_SECRET_KEY_PRODUCTION }} \
+            --set secrets.openai.apiKey=${{ secrets.OPENAI_API_KEY }} \
+            --wait \
+            --timeout 15m
+
+      - name: Verify deployment
+        run: |
+          export KUBECONFIG=./kubeconfig
+          kubectl rollout status deployment/backend -n ${{ env.KUBE_NAMESPACE }} --timeout=10m
+          kubectl rollout status deployment/frontend -n ${{ env.KUBE_NAMESPACE }} --timeout=10m
+          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
+
+  health-checks:
+    name: Run Health Checks
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    steps:
+      - name: Wait for services
+        run: |
+          echo "Waiting for production services to be ready..."
+          sleep 60
+
+      - name: Health check - Frontend
+        run: |
+          for i in {1..5}; do
+            if curl -f https://testing-platform.example.com/health; then
+              echo "Frontend health check passed"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying..."
+            sleep 10
+          done
+          echo "Frontend health check failed"
+          exit 1
+
+      - name: Health check - Backend
+        run: |
+          for i in {1..5}; do
+            if curl -f https://api.testing-platform.example.com/health; then
+              echo "Backend health check passed"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying..."
+            sleep 10
+          done
+          echo "Backend health check failed"
+          exit 1
+
+  rollback-on-failure:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy-production, health-checks]
+    if: failure()
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+          export KUBECONFIG=./kubeconfig
+
+      - name: Rollback deployment
+        run: |
+          export KUBECONFIG=./kubeconfig
+          echo "Rolling back to previous version..."
+          helm rollback testing-platform -n ${{ env.KUBE_NAMESPACE }}
+          kubectl rollout status deployment/backend -n ${{ env.KUBE_NAMESPACE }}
+          kubectl rollout status deployment/frontend -n ${{ env.KUBE_NAMESPACE }}
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-production, health-checks]
+    if: always()
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ github.event.release.tag_name || inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build Status: ${{ needs.build-and-push.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Deploy Status: ${{ needs.deploy-production.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health Checks: ${{ needs.health-checks.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Environment: https://testing-platform.example.com" >> $GITHUB_STEP_SUMMARY

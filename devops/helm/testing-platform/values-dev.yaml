@@ -1,0 +1,57 @@
+# Development environment values
+global:
+  registry: localhost:5000
+  imageTag: dev
+  imagePullPolicy: IfNotPresent
+
+backend:
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+  env:
+    LOG_LEVEL: debug
+    NODE_ENV: development
+
+frontend:
+  replicaCount: 1
+  env:
+    NODE_ENV: development
+
+runner:
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+
+postgres:
+  persistence:
+    size: 5Gi
+
+minio:
+  persistence:
+    size: 10Gi
+
+ingress:
+  enabled: false
+  tls:
+    enabled: false
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+    - host: localhost
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: backend
+
+secrets:
+  database:
+    password: postgres
+  jwt:
+    secret: dev-secret-key
+    refreshSecret: dev-refresh-secret-key
+  minio:
+    rootPassword: minioadmin
+    secretKey: minioadmin

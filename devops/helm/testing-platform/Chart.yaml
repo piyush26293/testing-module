@@ -1,0 +1,19 @@
+apiVersion: v2
+name: testing-platform
+description: AI-Powered End-to-End Web Application Testing Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - testing
+  - automation
+  - playwright
+  - ai
+  - e2e-testing
+maintainers:
+  - name: Testing Platform Team
+    email: team@testing-platform.com
+home: https://github.com/piyush26293/testing-module
+sources:
+  - https://github.com/piyush26293/testing-module
+icon: https://testing-platform.example.com/icon.png

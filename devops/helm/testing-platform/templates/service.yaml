@@ -1,0 +1,104 @@
+{{- if .Values.backend.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: backend
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+    - port: {{ .Values.backend.service.port }}
+      targetPort: {{ .Values.backend.service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: backend
+{{- end }}
+---
+{{- if .Values.frontend.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: frontend
+spec:
+  type: {{ .Values.frontend.service.type }}
+  ports:
+    - port: {{ .Values.frontend.service.port }}
+      targetPort: {{ .Values.frontend.service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: frontend
+{{- end }}
+---
+{{- if .Values.postgres.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: postgres
+spec:
+  type: {{ .Values.postgres.service.type }}
+  ports:
+    - port: {{ .Values.postgres.service.port }}
+      targetPort: {{ .Values.postgres.service.port }}
+      protocol: TCP
+      name: postgres
+  selector:
+    app: postgres
+  clusterIP: None
+{{- end }}
+---
+{{- if .Values.redis.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: redis
+spec:
+  type: {{ .Values.redis.service.type }}
+  ports:
+    - port: {{ .Values.redis.service.port }}
+      targetPort: {{ .Values.redis.service.port }}
+      protocol: TCP
+      name: redis
+  selector:
+    app: redis
+{{- end }}
+---
+{{- if .Values.minio.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "testing-platform.labels" . | nindent 4 }}
+    app: minio
+spec:
+  type: {{ .Values.minio.service.type }}
+  ports:
+    - port: {{ .Values.minio.service.apiPort }}
+      targetPort: {{ .Values.minio.service.apiPort }}
+      protocol: TCP
+      name: api
+    - port: {{ .Values.minio.service.consolePort }}
+      targetPort: {{ .Values.minio.service.consolePort }}
+      protocol: TCP
+      name: console
+  selector:
+    app: minio
+{{- end }}

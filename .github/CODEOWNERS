@@ -1,0 +1,35 @@
+# CODEOWNERS file for AI-Powered Testing Platform
+# These owners will be the default owners for everything in the repo
+# Unless a later match takes precedence, they will be requested for
+# review when someone opens a pull request.
+
+# Default owners for everything in the repo
+* @piyush26293
+
+# Backend code
+/backend/ @piyush26293
+
+# Frontend code (when created)
+/frontend/ @piyush26293
+
+# DevOps and infrastructure
+/devops/ @piyush26293
+/.github/ @piyush26293
+/docker-compose.yml @piyush26293
+
+# Database migrations and schemas
+/database/ @piyush26293
+
+# Documentation
+*.md @piyush26293
+/docs/ @piyush26293
+
+# Configuration files
+.env.example @piyush26293
+*.json @piyush26293
+*.yaml @piyush26293
+*.yml @piyush26293
+
+# Scripts
+/devops/scripts/ @piyush26293
+*.sh @piyush26293

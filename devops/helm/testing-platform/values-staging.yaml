@@ -1,0 +1,46 @@
+# Staging environment values
+global:
+  registry: your-registry.example.com
+  imageTag: staging
+  imagePullPolicy: Always
+
+backend:
+  replicaCount: 2
+  autoscaling:
+    minReplicas: 2
+    maxReplicas: 5
+  env:
+    LOG_LEVEL: info
+
+frontend:
+  replicaCount: 2
+
+runner:
+  replicaCount: 1
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 10
+
+postgres:
+  persistence:
+    size: 10Gi
+
+minio:
+  persistence:
+    size: 20Gi
+
+ingress:
+  enabled: true
+  tls:
+    enabled: true
+  hosts:
+    - host: staging.testing-platform.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+    - host: api-staging.testing-platform.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: backend

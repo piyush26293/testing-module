@@ -1,0 +1,154 @@
+name: CD - Deploy to Staging
+
+on:
+  push:
+    branches: [ development ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+  KUBE_NAMESPACE: ai-testing-platform-staging
+
+jobs:
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [backend, frontend, runner, nginx]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.component }}
+          tags: |
+            type=raw,value=staging
+            type=sha,prefix=staging-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.component == 'nginx' && './devops/docker/nginx' || (matrix.component == 'runner' && './runner' || format('./{0}', matrix.component)) }}
+          file: ${{ matrix.component == 'nginx' && './devops/docker/nginx/Dockerfile' || format('./devops/docker/{0}/Dockerfile', matrix.component) }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: ${{ matrix.component == 'backend' || matrix.component == 'frontend' ? 'production' : '' }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    environment:
+      name: staging
+      url: https://staging.testing-platform.example.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > kubeconfig
+          export KUBECONFIG=./kubeconfig
+
+      - name: Update image tags in Helm values
+        run: |
+          sed -i 's|imageTag:.*|imageTag: staging|g' devops/helm/testing-platform/values-staging.yaml
+
+      - name: Deploy with Helm
+        run: |
+          export KUBECONFIG=./kubeconfig
+          helm upgrade --install testing-platform ./devops/helm/testing-platform \
+            --namespace ${{ env.KUBE_NAMESPACE }} \
+            --create-namespace \
+            --values ./devops/helm/testing-platform/values-staging.yaml \
+            --set global.registry=${{ env.REGISTRY }} \
+            --set global.imageTag=staging \
+            --set secrets.database.password=${{ secrets.DB_PASSWORD_STAGING }} \
+            --set secrets.jwt.secret=${{ secrets.JWT_SECRET_STAGING }} \
+            --set secrets.jwt.refreshSecret=${{ secrets.JWT_REFRESH_SECRET_STAGING }} \
+            --set secrets.minio.rootPassword=${{ secrets.MINIO_PASSWORD_STAGING }} \
+            --set secrets.minio.secretKey=${{ secrets.MINIO_SECRET_KEY_STAGING }} \
+            --set secrets.openai.apiKey=${{ secrets.OPENAI_API_KEY }} \
+            --wait \
+            --timeout 10m
+
+      - name: Verify deployment
+        run: |
+          export KUBECONFIG=./kubeconfig
+          kubectl rollout status deployment/backend -n ${{ env.KUBE_NAMESPACE }}
+          kubectl rollout status deployment/frontend -n ${{ env.KUBE_NAMESPACE }}
+          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
+
+  smoke-tests:
+    name: Run Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for staging environment to be ready..."
+          sleep 30
+
+      - name: Run smoke tests
+        run: |
+          # Add your smoke test commands here
+          curl -f https://staging.testing-platform.example.com/health || exit 1
+          curl -f https://api-staging.testing-platform.example.com/health || exit 1
+          echo "Smoke tests passed!"
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-staging, smoke-tests]
+    if: always()
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Build Status: ${{ needs.build-and-push.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Deploy Status: ${{ needs.deploy-staging.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Smoke Tests: ${{ needs.smoke-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Environment: https://staging.testing-platform.example.com" >> $GITHUB_STEP_SUMMARY

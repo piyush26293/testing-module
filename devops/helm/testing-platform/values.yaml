@@ -1,0 +1,234 @@
+# Default values for testing-platform
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  registry: your-registry.example.com
+  imageTag: latest
+  imagePullPolicy: Always
+  storageClass: standard
+
+namespace: ai-testing-platform
+
+# Backend configuration
+backend:
+  enabled: true
+  name: backend
+  replicaCount: 3
+  image:
+    repository: ai-testing-backend
+    pullPolicy: Always
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 3001
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  env:
+    NODE_ENV: production
+    PORT: "3001"
+    LOG_LEVEL: info
+    CORS_ORIGIN: "*"
+    RATE_LIMIT_TTL: "60"
+    RATE_LIMIT_MAX: "100"
+
+# Frontend configuration
+frontend:
+  enabled: true
+  name: frontend
+  replicaCount: 2
+  image:
+    repository: ai-testing-frontend
+    pullPolicy: Always
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  env:
+    NODE_ENV: production
+    NEXT_TELEMETRY_DISABLED: "1"
+
+# Runner configuration
+runner:
+  enabled: true
+  name: runner
+  replicaCount: 2
+  image:
+    repository: ai-testing-runner
+    pullPolicy: Always
+    tag: ""
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 85
+  env:
+    NODE_ENV: production
+    PLAYWRIGHT_HEADLESS: "true"
+
+# PostgreSQL configuration
+postgres:
+  enabled: true
+  name: postgres
+  image:
+    repository: postgres
+    tag: 15-alpine
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5432
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: ""
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  env:
+    POSTGRES_DB: ai_testing_platform
+
+# Redis configuration
+redis:
+  enabled: true
+  name: redis
+  image:
+    repository: redis
+    tag: 7-alpine
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 6379
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# MinIO configuration
+minio:
+  enabled: true
+  name: minio
+  image:
+    repository: minio/minio
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    apiPort: 9000
+    consolePort: 9001
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+  tls:
+    enabled: true
+    secretName: testing-platform-tls
+  hosts:
+    - host: testing-platform.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+    - host: api.testing-platform.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: backend
+
+# Secrets configuration
+secrets:
+  database:
+    user: postgres
+    password: REPLACE_WITH_SECURE_PASSWORD
+  jwt:
+    secret: REPLACE_WITH_SECURE_RANDOM_STRING
+    refreshSecret: REPLACE_WITH_SECURE_RANDOM_STRING
+  minio:
+    rootUser: minioadmin
+    rootPassword: REPLACE_WITH_SECURE_PASSWORD
+    accessKey: minioadmin
+    secretKey: REPLACE_WITH_SECURE_PASSWORD
+  openai:
+    apiKey: REPLACE_WITH_OPENAI_API_KEY
+    model: gpt-4
+    maxTokens: "2000"
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod Security
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

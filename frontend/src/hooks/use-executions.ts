@@ -56,8 +56,9 @@ export function useExecution(id: string) {
     queryKey: ['execution', id],
     queryFn: () => executionsService.getById(id),
     enabled: !!id,
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
       // Refetch every 2 seconds if execution is running
+      const data = query.state.data;
       return data?.status === 'running' ? 2000 : false;
     },
   });

@@ -1,6 +1,31 @@
 # Multi-stage build for NestJS Backend
+
+# Development stage
+FROM node:20-alpine AS development
+
+WORKDIR /app
+
+# Install dependencies for node-gyp (if needed)
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies including dev dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 3001
+EXPOSE 9229
+
+# Start in development mode with hot reload
+CMD ["npm", "run", "start:dev"]
+
 # Build stage
-FROM node:25-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +42,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:25-alpine AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 

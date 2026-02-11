@@ -14,10 +14,12 @@ export const useAuthStore = create<AuthState>()(
       login: async (credentials: LoginCredentials) => {
         try {
           const response = await authService.login(credentials);
-          setAuthToken(response.access_token);
+          // Backend returns accessToken, not access_token
+          const token = response.accessToken || response.access_token;
+          setAuthToken(token);
           set({
             user: response.user,
-            token: response.access_token,
+            token: token,
             isAuthenticated: true,
           });
         } catch (error) {
@@ -29,10 +31,12 @@ export const useAuthStore = create<AuthState>()(
       register: async (data: RegisterData) => {
         try {
           const response = await authService.register(data);
-          setAuthToken(response.access_token);
+          // Backend returns accessToken, not access_token
+          const token = response.accessToken || response.access_token;
+          setAuthToken(token);
           set({
             user: response.user,
-            token: response.access_token,
+            token: token,
             isAuthenticated: true,
           });
         } catch (error) {

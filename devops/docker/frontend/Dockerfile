@@ -1,6 +1,7 @@
 # Multi-stage build for Next.js Frontend
-# Dependencies stage
-FROM node:25-alpine AS deps
+
+# Development stage (MUST be first for docker-compose target)
+FROM node:20-alpine AS development
 
 WORKDIR /app
 
@@ -10,11 +11,34 @@ RUN apk add --no-cache libc6-compat
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install all dependencies with legacy peer deps to avoid conflicts
+RUN npm install --legacy-peer-deps
+
+# Copy source
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start in development mode
+CMD ["npm", "run", "dev"]
+
+# Dependencies stage
+FROM node:20-alpine AS deps
+
+WORKDIR /app
+
+# Install libc6-compat for Next.js
+RUN apk add --no-cache libc6-compat
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies with legacy peer deps
+RUN npm ci --legacy-peer-deps
 
 # Builder stage
-FROM node:25-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -32,7 +56,7 @@ ENV NODE_ENV production
 RUN npm run build
 
 # Production stage
-FROM node:25-alpine AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
@@ -58,29 +82,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
 # Start application
 CMD ["node", "server.js"]
-
-# Development stage
-FROM node:25-alpine AS development
-
-WORKDIR /app
-
-RUN apk add --no-cache libc6-compat
-
-# Copy package files
-COPY package*.json ./
-
-# Install all dependencies
-RUN npm install
-
-# Copy source
-COPY . .
-
-# Expose port
-EXPOSE 3000
-
-# Start in development mode
-CMD ["npm", "run", "dev"]

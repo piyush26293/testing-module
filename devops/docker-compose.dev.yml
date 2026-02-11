@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -13,7 +11,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - testing-network
     healthcheck:
@@ -54,7 +51,7 @@ services:
       - testing-network
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -62,9 +59,8 @@ services:
   # Backend API Service - Development
   backend:
     build:
-      context: ./backend
-      dockerfile: ../devops/docker/backend/Dockerfile
-      target: development
+      context: ../backend
+      dockerfile: Dockerfile
     container_name: ai-testing-backend-dev
     environment:
       NODE_ENV: development
@@ -79,19 +75,19 @@ services:
       MINIO_PORT: 9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-      MINIO_USE_SSL: 'false'
+      MINIO_USE_SSL: "false"
       JWT_SECRET: dev-secret-key-change-in-production
       JWT_EXPIRATION: 7d
       JWT_REFRESH_SECRET: dev-refresh-secret-key
       JWT_REFRESH_EXPIRATION: 30d
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-placeholder}
       PORT: 3001
       LOG_LEVEL: debug
     ports:
       - "3001:3001"
-      - "9229:9229" # Debug port
+      - "9229:9229"
     volumes:
-      - ./backend:/app
+      - ../backend:/app
       - /app/node_modules
       - backend_logs:/app/logs
     networks:
@@ -101,16 +97,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      minio:
-        condition: service_healthy
     command: npm run start:dev
 
   # Frontend Service - Development
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../devops/docker/frontend/Dockerfile
-      target: development
+      context: ../frontend
+      dockerfile: Dockerfile
     container_name: ai-testing-frontend-dev
     environment:
       NODE_ENV: development
@@ -120,7 +113,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ../frontend:/app
       - /app/node_modules
       - /app/.next
     networks:

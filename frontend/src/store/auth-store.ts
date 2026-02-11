@@ -16,6 +16,9 @@ export const useAuthStore = create<AuthState>()(
           const response = await authService.login(credentials);
           // Backend returns accessToken, not access_token
           const token = response.accessToken || response.access_token;
+          if (!token) {
+            throw new Error('No access token received from server');
+          }
           setAuthToken(token);
           set({
             user: response.user,
@@ -33,6 +36,9 @@ export const useAuthStore = create<AuthState>()(
           const response = await authService.register(data);
           // Backend returns accessToken, not access_token
           const token = response.accessToken || response.access_token;
+          if (!token) {
+            throw new Error('No access token received from server');
+          }
           setAuthToken(token);
           set({
             user: response.user,

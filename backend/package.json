@@ -1,1 +1,95 @@
-{\n  \"name\": \"testing-platform-backend\",\n  \"version\": \"1.0.0\",\n  \"description\": \"AI-Powered Testing Platform Backend\",\n  \"author\": \"Testing Platform Team\",\n  \"private\": true,\n  \"license\": \"MIT\",\n  \"scripts\": {\n    \"build\": \"nest build\",\n    \"format\": \"prettier --write \"src/**/*.ts\" \"test/**/*.ts\"\",\n    \"start\": \"nest start\",\n    \"start:dev\": \"nest start --watch\",\n    \"start:debug\": \"nest start --debug --watch\",\n    \"start:prod\": \"node dist/main\",\n    \"lint\": \"eslint \"{src,apps,libs,test}/**/*.ts\" --fix\",\n    \"test\": \"jest\",\n    \"test:watch\": \"jest --watch\",\n    \"test:cov\": \"jest --coverage\",\n    \"test:debug\": \"node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand\",\n    \"test:e2e\": \"jest --config ./test/jest-e2e.json\",\n    \"typeorm\": \"typeorm-ts-node-commonjs\",\n    \"migration:generate\": \"npm run typeorm -- migration:generate\",\n    \"migration:run\": \"npm run typeorm -- migration:run\",\n    \"migration:revert\": \"npm run typeorm -- migration:revert\"\n  },\n  \"dependencies\": {\n    \"@nestjs/bull\": \"^10.1.1\",\n    \"@nestjs/common\": \"^10.3.0\",\n    \"@nestjs/config\": \"^3.1.1\",\n    \"@nestjs/core\": \"^10.3.0\",\n    \"@nestjs/jwt\": \"^10.2.0\",\n    \"@nestjs/passport\": \"^10.0.3\",\n    \"@nestjs/platform-express\": \"^10.3.0\",\n    \"@nestjs/swagger\": \"^7.2.0\",\n    \"@nestjs/typeorm\": \"^10.0.1\",\n    \"bcryptjs\": \"^2.4.3\",\n    \"bull\": \"^4.12.2\",\n    \"class-transformer\": \"^0.5.1\",\n    \"class-validator\": \"^0.14.1\",\n    \"ioredis\": \"^5.3.2\",\n    \"minio\": \"^7.1.3\",\n    \"openai\": \"^4.28.0\",\n    \"passport\": \"^0.7.0\",\n    \"passport-jwt\": \"^4.0.1\",\n    \"pg\": \"^8.11.3\",\n    \"reflect-metadata\": \"^0.2.1\",\n    \"rxjs\": \"^7.8.1\",\n    \"typeorm\": \"^0.3.20\",\n    \"uuid\": \"^9.0.1\"\n  },\n  \"devDependencies\": {\n    \"@nestjs/cli\": \"^10.3.0\",\n    \"@nestjs/schematics\": \"^10.1.0\",\n    \"@nestjs/testing\": \"^10.3.0\",\n    \"@types/bcryptjs\": \"^2.4.6\",\n    \"@types/express\": \"^4.17.21\",\n    \"@types/jest\": \"^29.5.11\",\n    \"@types/multer\": \"^1.4.11\",\n    \"@types/node\": \"^20.11.0\",\n    \"@types/passport-jwt\": \"^4.0.1\",\n    \"@types/supertest\": \"^6.0.2\",\n    \"@types/uuid\": \"^9.0.7\",\n    \"@typescript-eslint/eslint-plugin\": \"^6.19.0\",\n    \"@typescript-eslint/parser\": \"^6.19.0\",\n    \"eslint\": \"^8.56.0\",\n    \"eslint-config-prettier\": \"^9.1.0\",\n    \"eslint-plugin-prettier\": \"^5.1.3\",\n    \"jest\": \"^29.7.0\",\n    \"prettier\": \"^3.2.4\",\n    \"source-map-support\": \"^0.5.21\",\n    \"supertest\": \"^6.3.4\",\n    \"ts-jest\": \"^29.1.2\",\n    \"ts-loader\": \"^9.5.1\",\n    \"ts-node\": \"^10.9.2\",\n    \"tsconfig-paths\": \"^4.2.0\",\n    \"typescript\": \"^5.3.3\"\n  },\n  \"jest\": {\n    \"moduleFileExtensions\": [\n      \"js\",\n      \"json\",\n      \"ts\"\n    ],\n    \"rootDir\": \"src\",\n    \"testRegex\": \".*\\.spec\\.ts$\",\n    \"transform\": {\n      \"^.+\\.(t|j)s$\": \"ts-jest\"\n    },\n    \"collectCoverageFrom\": [\n      \"**/*.(t|j)s\"\n    ],\n    \"coverageDirectory\": \"../coverage\",\n    \"testEnvironment\": \"node\"\n  }\n}
+{
+  "name": "testing-platform-backend",
+  "version": "1.0.0",
+  "description": "AI-Powered Testing Platform Backend",
+  "author": "Testing Platform Team",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert"
+  },
+  "dependencies": {
+    "@nestjs/bull": "^10.1.1",
+    "@nestjs/common": "^10.3.10",
+    "@nestjs/config": "^3.2.3",
+    "@nestjs/core": "^10.3.10",
+    "@nestjs/jwt": "^10.2.0",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/platform-express": "^10.3.10",
+    "@nestjs/swagger": "^7.4.0",
+    "@nestjs/typeorm": "^10.0.2",
+    "bcryptjs": "^2.4.3",
+    "bull": "^4.16.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "ioredis": "^5.4.1",
+    "minio": "^8.0.1",
+    "openai": "^4.56.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.12.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.2",
+    "@nestjs/schematics": "^10.1.3",
+    "@nestjs/testing": "^10.3.10",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^22.5.0",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.4",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.4"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}

@@ -2,9 +2,6 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies for node-gyp and bcrypt
-RUN apk add --no-cache python3 make g++ gcc libc-dev linux-headers
-
 # Copy package files
 COPY package*.json ./
 

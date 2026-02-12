@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Project } from './project.entity';
 import { User } from './user.entity';
-import { UserRole } from './user.entity';
+import { UserRole } from './enums/user-role.enum';
 
 @Entity('project_members')
 @Unique(['projectId', 'userId'])

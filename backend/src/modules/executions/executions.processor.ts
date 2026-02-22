@@ -63,7 +63,7 @@ export class ExecutionsProcessor {
         execution.completedAt = new Date();
         execution.errorMessage = error.message;
         execution.stackTrace = error.stack;
-        
+
         if (execution.startedAt) {
           execution.durationMs = execution.completedAt.getTime() - execution.startedAt.getTime();
         }
@@ -75,8 +75,8 @@ export class ExecutionsProcessor {
 
   private async simulateExecution(execution: TestExecution): Promise<void> {
     // Simulate test execution delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     this.logger.log(`Simulated execution for ${execution.id}`);
   }
 }

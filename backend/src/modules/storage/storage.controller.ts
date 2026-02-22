@@ -280,11 +280,7 @@ export class StorageController {
           items: {
             type: 'string',
           },
-          example: [
-            'screenshots/abc-123.png',
-            'screenshots/def-456.jpg',
-            'videos/video-789.mp4',
-          ],
+          example: ['screenshots/abc-123.png', 'screenshots/def-456.jpg', 'videos/video-789.mp4'],
         },
         count: {
           type: 'number',
@@ -301,10 +297,7 @@ export class StorageController {
     status: 500,
     description: 'Internal server error',
   })
-  async listFiles(
-    @Query('folder') folder: string = '',
-    @Query('prefix') prefix: string = '',
-  ) {
+  async listFiles(@Query('folder') folder: string = '', @Query('prefix') prefix: string = '') {
     const files = await this.storageService.listFiles(folder, prefix);
     return {
       files,

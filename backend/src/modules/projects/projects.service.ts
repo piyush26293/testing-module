@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Project, ProjectStatus } from '../../database/entities/project.entity';
+import { Project } from '../../database/entities/project.entity';
 import { ProjectMember } from '../../database/entities/project-member.entity';
 import { User, UserRole } from '../../database/entities/user.entity';
 import { CreateProjectDto } from './dto/create-project.dto';

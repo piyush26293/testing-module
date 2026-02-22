@@ -32,10 +32,7 @@ export class ExecutionsController {
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to project' })
-  async create(
-    @Body() createDto: CreateExecutionDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  async create(@Body() createDto: CreateExecutionDto, @CurrentUser('id') userId: string) {
     return this.executionsService.create(createDto, userId);
   }
 
@@ -44,10 +41,7 @@ export class ExecutionsController {
   @ApiResponse({ status: 200, description: 'Returns paginated executions list' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to project' })
-  async findAll(
-    @Query() filters: ExecutionFiltersDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  async findAll(@Query() filters: ExecutionFiltersDto, @CurrentUser('id') userId: string) {
     return this.executionsService.findAll(filters, userId);
   }
 
@@ -58,10 +52,7 @@ export class ExecutionsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to this execution' })
   @ApiResponse({ status: 404, description: 'Execution not found' })
-  async findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     return this.executionsService.findOne(id, userId);
   }
 
@@ -86,10 +77,7 @@ export class ExecutionsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to this execution' })
   @ApiResponse({ status: 404, description: 'Execution not found' })
-  async remove(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     await this.executionsService.remove(id, userId);
     return { message: 'Execution deleted successfully' };
   }
@@ -102,10 +90,7 @@ export class ExecutionsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to this execution' })
   @ApiResponse({ status: 404, description: 'Execution not found' })
-  async stopExecution(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async stopExecution(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     return this.executionsService.stopExecution(id, userId);
   }
 
@@ -116,10 +101,7 @@ export class ExecutionsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to this execution' })
   @ApiResponse({ status: 404, description: 'Execution not found' })
-  async getLogs(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async getLogs(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     return this.executionsService.getLogs(id, userId);
   }
 }

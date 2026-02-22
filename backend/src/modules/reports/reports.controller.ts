@@ -13,7 +13,14 @@ import {
   StreamableFile,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
 import { GenerateReportDto } from './dto/generate-report.dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -36,10 +43,7 @@ export class ReportsController {
   @ApiResponse({ status: 400, description: 'Invalid input or date range' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to project' })
-  async generate(
-    @Body() generateReportDto: GenerateReportDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  async generate(@Body() generateReportDto: GenerateReportDto, @CurrentUser('id') userId: string) {
     return this.reportsService.generate(generateReportDto, userId);
   }
 
@@ -64,10 +68,7 @@ export class ReportsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to report' })
   @ApiResponse({ status: 404, description: 'Report not found' })
-  async findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     return this.reportsService.findOne(id, userId);
   }
 
@@ -79,10 +80,7 @@ export class ReportsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - No access to report' })
   @ApiResponse({ status: 404, description: 'Report not found' })
-  async remove(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser('id') userId: string) {
     await this.reportsService.remove(id, userId);
   }
 

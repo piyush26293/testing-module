@@ -33,7 +33,11 @@ export class CreateExecutionDto {
   @MaxLength(100)
   environment?: string;
 
-  @ApiProperty({ description: 'Execution trigger', enum: ExecutionTrigger, default: ExecutionTrigger.MANUAL })
+  @ApiProperty({
+    description: 'Execution trigger',
+    enum: ExecutionTrigger,
+    default: ExecutionTrigger.MANUAL,
+  })
   @IsEnum(ExecutionTrigger)
   trigger: ExecutionTrigger;
 }

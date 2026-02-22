@@ -86,16 +86,10 @@ export class StorageService implements OnModuleInit {
       }
 
       // Upload to MinIO
-      await this.minioClient.putObject(
-        this.bucketName,
-        objectName,
-        file.buffer,
-        file.size,
-        {
-          'Content-Type': file.mimetype,
-          'X-Original-Name': file.originalname,
-        },
-      );
+      await this.minioClient.putObject(this.bucketName, objectName, file.buffer, file.size, {
+        'Content-Type': file.mimetype,
+        'X-Original-Name': file.originalname,
+      });
 
       this.logger.log(`File uploaded successfully: ${objectName}`);
 
@@ -104,7 +98,7 @@ export class StorageService implements OnModuleInit {
       const port = this.configService.get<number>('MINIO_PORT', 9000);
       const useSSL = this.configService.get<boolean>('MINIO_USE_SSL', false);
       const protocol = useSSL ? 'https' : 'http';
-      
+
       return `${protocol}://${endpoint}:${port}/${this.bucketName}/${objectName}`;
     } catch (error) {
       this.logger.error(`Failed to upload file: ${error.message}`, error.stack);
@@ -132,7 +126,7 @@ export class StorageService implements OnModuleInit {
       // Get file stream
       const stream = await this.minioClient.getObject(this.bucketName, fileName);
       this.logger.log(`File downloaded: ${fileName}`);
-      
+
       return stream;
     } catch (error) {
       if (error.code === 'NotFound') {
@@ -190,12 +184,8 @@ export class StorageService implements OnModuleInit {
       await this.minioClient.statObject(this.bucketName, fileName);
 
       // Generate presigned URL
-      const url = await this.minioClient.presignedGetObject(
-        this.bucketName,
-        fileName,
-        expiry,
-      );
-      
+      const url = await this.minioClient.presignedGetObject(this.bucketName, fileName, expiry);
+
       this.logger.log(`Presigned URL generated for: ${fileName}`);
       return url;
     } catch (error) {
@@ -243,19 +233,19 @@ export class StorageService implements OnModuleInit {
       );
 
       const files: string[] = [];
-      
+
       return new Promise((resolve, reject) => {
         objectsStream.on('data', (obj: BucketItemFromList) => {
           if (obj.name) {
             files.push(obj.name);
           }
         });
-        
+
         objectsStream.on('error', (error) => {
           this.logger.error(`Failed to list files: ${error.message}`, error.stack);
           reject(new InternalServerErrorException('Failed to list files'));
         });
-        
+
         objectsStream.on('end', () => {
           resolve(files);
         });

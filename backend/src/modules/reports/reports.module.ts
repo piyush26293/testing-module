@@ -8,11 +8,7 @@ import { ProjectsModule } from '../projects/projects.module';
 import { ExecutionsModule } from '../executions/executions.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Report, TestExecution]),
-    ProjectsModule,
-    ExecutionsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Report, TestExecution]), ProjectsModule, ExecutionsModule],
   controllers: [ReportsController],
   providers: [ReportsService],
   exports: [ReportsService],

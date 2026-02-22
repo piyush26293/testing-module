@@ -220,7 +220,7 @@ export class AuthService {
   }
 
   private sanitizeUser(user: User) {
-    const { passwordHash, ...sanitized } = user;
+    const { passwordHash: _passwordHash, ...sanitized } = user;
     return sanitized;
   }
 

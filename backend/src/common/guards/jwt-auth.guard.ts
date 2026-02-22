@@ -30,7 +30,7 @@ export class JwtAuthGuard implements CanActivate {
         secret: this.configService.get<string>('jwt.secret'),
       });
       request.user = payload;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
 

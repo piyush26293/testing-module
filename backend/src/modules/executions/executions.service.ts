@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { TestExecution, ExecutionStatus } from '../../database/entities/test-execution.entity';
@@ -62,7 +62,18 @@ export class ExecutionsService {
     filters: ExecutionFiltersDto,
     userId: string,
   ): Promise<PaginatedResult<TestExecution>> {
-    const { page = 1, limit = 10, projectId, testCaseId, suiteId, status, trigger, browser, startDate, endDate } = filters;
+    const {
+      page = 1,
+      limit = 10,
+      projectId,
+      testCaseId,
+      suiteId,
+      status,
+      trigger,
+      browser,
+      startDate,
+      endDate,
+    } = filters;
     const skip = (page - 1) * limit;
 
     if (projectId) {
@@ -116,10 +127,7 @@ export class ExecutionsService {
       queryBuilder.andWhere('execution.createdAt <= :endDate', { endDate });
     }
 
-    queryBuilder
-      .orderBy('execution.createdAt', 'DESC')
-      .skip(skip)
-      .take(limit);
+    queryBuilder.orderBy('execution.createdAt', 'DESC').skip(skip).take(limit);
 
     const [executions, total] = await queryBuilder.getManyAndCount();
 
@@ -144,10 +152,7 @@ export class ExecutionsService {
     return execution;
   }
 
-  async updateStatus(
-    id: string,
-    updateDto: UpdateExecutionStatusDto,
-  ): Promise<TestExecution> {
+  async updateStatus(id: string, updateDto: UpdateExecutionStatusDto): Promise<TestExecution> {
     const execution = await this.executionRepository.findOne({ where: { id } });
 
     if (!execution) {
@@ -161,14 +166,17 @@ export class ExecutionsService {
     }
 
     if (
-      [ExecutionStatus.PASSED, ExecutionStatus.FAILED, ExecutionStatus.ERROR, ExecutionStatus.SKIPPED].includes(
-        updateDto.status,
-      )
+      [
+        ExecutionStatus.PASSED,
+        ExecutionStatus.FAILED,
+        ExecutionStatus.ERROR,
+        ExecutionStatus.SKIPPED,
+      ].includes(updateDto.status)
     ) {
       execution.completedAt = new Date();
       if (execution.startedAt) {
-        execution.durationMs = updateDto.durationMs || 
-          new Date().getTime() - execution.startedAt.getTime();
+        execution.durationMs =
+          updateDto.durationMs || new Date().getTime() - execution.startedAt.getTime();
       }
     }
 
@@ -214,14 +222,17 @@ export class ExecutionsService {
       throw new ForbiddenException('You do not have access to this execution');
     }
 
-    if (execution.status !== ExecutionStatus.RUNNING && execution.status !== ExecutionStatus.PENDING) {
+    if (
+      execution.status !== ExecutionStatus.RUNNING &&
+      execution.status !== ExecutionStatus.PENDING
+    ) {
       throw new BadRequestException('Only running or pending executions can be stopped');
     }
 
     execution.status = ExecutionStatus.ERROR;
     execution.errorMessage = 'Execution stopped by user';
     execution.completedAt = new Date();
-    
+
     if (execution.startedAt) {
       execution.durationMs = new Date().getTime() - execution.startedAt.getTime();
     }

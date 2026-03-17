@@ -1,3 +1,5 @@
+import * as crypto from 'crypto';
+
 export function createPaginatedResponse<T>(data: T[], total: number, page: number, limit: number) {
   const totalPages = Math.ceil(total / limit);
 
@@ -28,9 +30,10 @@ export function slugify(text: string): string {
 
 export function generateRandomString(length: number = 32): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const randomBytes = crypto.randomBytes(length);
   let result = '';
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    result += chars.charAt(randomBytes[i] % chars.length);
   }
   return result;
 }

@@ -22,24 +22,26 @@ export function useToast() {
 
   // Auto-remove toasts after 5 seconds with proper cleanup
   useEffect(() => {
+    const timers = timersRef.current;
+
     toasts.forEach((t) => {
       // Only set timer if not already set
-      if (!timersRef.current.has(t.id)) {
+      if (!timers.has(t.id)) {
         const timer = setTimeout(() => {
           removeToast(t.id);
-          timersRef.current.delete(t.id);
+          timers.delete(t.id);
         }, 5000);
-        timersRef.current.set(t.id, timer);
+        timers.set(t.id, timer);
       }
     });
 
     // Cleanup timers for removed toasts
     return () => {
       const currentToastIds = new Set(toasts.map(t => t.id));
-      timersRef.current.forEach((timer, id) => {
+      timers.forEach((timer, id) => {
         if (!currentToastIds.has(id)) {
           clearTimeout(timer);
-          timersRef.current.delete(id);
+          timers.delete(id);
         }
       });
     };

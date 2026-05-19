@@ -1,5 +1,5 @@
 # Nginx reverse proxy
-FROM nginx:1.29-alpine
+FROM nginx:1.31-alpine
 
 # Remove default nginx configuration
 RUN rm /etc/nginx/conf.d/default.conf
